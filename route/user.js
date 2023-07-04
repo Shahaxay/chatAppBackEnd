@@ -6,4 +6,6 @@ const route=express.Router();
 
 route.post('/signup',userController.postSignup);
 
+route.post('/login',userController.postLogin);
+
 module.exports=route;
