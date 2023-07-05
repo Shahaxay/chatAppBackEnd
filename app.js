@@ -3,7 +3,10 @@ const cors=require('cors');
 const bodyParser=require('body-parser');
 
 const userRoute=require('./route/user');
+const messageRoute=require('./route/message');
 const db=require('./service/db');
+const User=require('./model/user');
+const Message=require('./model/message');
 
 
 const app=express();
@@ -14,6 +17,10 @@ app.use(cors({
 app.use(bodyParser.json());
 
 app.use('/user',userRoute);
+app.use(messageRoute);
+
+User.hasOne(Message);
+Message.belongsTo(User);
 
 // db.sync({force:true})
 db.sync()

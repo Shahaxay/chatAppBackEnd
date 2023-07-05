@@ -1,7 +1,10 @@
 const bcrypt=require('bcrypt');
 const jwt=require('jsonwebtoken');
+const dotenv=require('dotenv');
 
 const User=require('../model/user');
+
+dotenv.config();
 
 const postSignup=async (req,res,next)=>{
     const {name,email,password,phone} =req.body;
@@ -36,14 +39,9 @@ const postLogin=async(req,res,next)=>{
                     return res.status(500).json({message:"server internal error"});
                 }
                 if(result){
-                    const secret_key="this is a secret key";
-                    jwt.sign({id:user.id},secret_key,(err,encrypted_result)=>{
-                        if(err){
-                            console.log(err);
-                            return res.status(501).json({message:"server internal error"});
-                        }
-                        res.status(201).json({id:encrypted_result})
-                    })
+                    const secret_key=process.env.SECRET_KEY;
+                    const encrypted_userId=jwt.sign({userId:user.id},secret_key);
+                    res.status(201).json({id:encrypted_userId});
                 }else{
                     res.status(401).json({message:"User not authorized"});
                 }
