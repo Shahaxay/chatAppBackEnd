@@ -19,7 +19,7 @@ app.use(bodyParser.json());
 app.use('/user',userRoute);
 app.use(messageRoute);
 
-User.hasOne(Message);
+User.hasMany(Message);
 Message.belongsTo(User);
 
 // db.sync({force:true})

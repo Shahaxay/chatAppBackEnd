@@ -7,4 +7,6 @@ const route=express.Router();
 
 route.post('/send-message',authentication.authenticate,messageController.postSendMessage);
 
+route.get('/get-messages',authentication.authenticate,messageController.getMessages);
+
 module.exports=route;

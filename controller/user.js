@@ -41,7 +41,7 @@ const postLogin=async(req,res,next)=>{
                 if(result){
                     const secret_key=process.env.SECRET_KEY;
                     const encrypted_userId=jwt.sign({userId:user.id},secret_key);
-                    res.status(201).json({id:encrypted_userId});
+                    res.status(201).json({id:encrypted_userId,name:user.name});
                 }else{
                     res.status(401).json({message:"User not authorized"});
                 }
