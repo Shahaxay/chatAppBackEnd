@@ -19,9 +19,13 @@ const postSendMessage=async(req,res,next)=>{
 }
 
 const getMessages=async(req,res,next)=>{
+    const last_message_id=+req.query.lastMessageId;
     try{
-        const messages=await Message.findAll();
-        res.status(201).json(messages); //also need to sedn name
+        const messages=await Message.findAll({
+            offset:last_message_id
+        });
+        // console.log(messages);
+        res.status(201).json(messages);
     }catch(err){
         console.log(err);
         res.status(500).json({message:"Internal Server Error"});
