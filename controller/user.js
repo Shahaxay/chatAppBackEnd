@@ -3,6 +3,7 @@ const jwt=require('jsonwebtoken');
 const dotenv=require('dotenv');
 
 const User=require('../model/user');
+const Group=require('../model/group');
 
 dotenv.config();
 
@@ -57,7 +58,70 @@ const postLogin=async(req,res,next)=>{
     }
 }
 
-module.exports={
+const getUsers=async(req,res,next)=>{
+    try{
+        let users=await User.findAll({
+            attributes:['id','name'],
+            limit:10
+        })
+        users=users.map(user=>{
+            if(user.id==req.user.id){
+                return;
+            }
+            user.dataValues.id=jwt.sign({userId:user.id},process.env.SECRET_KEY);
+            return user;
+        })
+        res.status(201).json(users);
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).json({message:"internal surver error"});
+    }
+}
+
+const postSendInvitation=async(req,res,next)=>{
+    let {users,name,groupId}=req.body;
+    try{
+        // groupId=jwt.verify(groupId,process.env.SECRET_KEY).groupId;
+        users.forEach(async user=>{
+            let receiverId=jwt.verify(user,process.env.SECRET_KEY);
+            await req.user.createInbox({
+                message:`http://localhost:3000/user/join-group/${groupId}`, //no need of header jwt
+                receiver:receiverId.userId
+            })
+            console.log("created");
+        })
+        res.status(201).json({status:"success"});
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).json({message:"internal surver error"});
+    }
+    
+    //save to db with sender and receiver name with link to join the group
+}
+
+const getJoinGroup=async (req,res,next)=>{
+    let groupId=req.params.groupId;
+    groupId=jwt.verify(groupId,process.env.SECRET_KEY).groupId;
+    try{
+        const group=await Group.findByPk(groupId);
+        const result=await req.user.addGroup(group);
+        let totalMember=group.totalMember+1;
+        await Group.update({totalMember:totalMember},{where:{id:groupId}});
+        console.log(result);
+        res.status(201).json({message:"success"});
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).json({message:"internal surver error"});
+    }
+}
+
+module.exports={ 
     postSignup,
-    postLogin
+    postLogin,
+    getUsers,
+    postSendInvitation,
+    getJoinGroup
 }

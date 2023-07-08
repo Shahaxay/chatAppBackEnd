@@ -7,6 +7,9 @@ const messageRoute=require('./route/message');
 const db=require('./service/db');
 const User=require('./model/user');
 const Message=require('./model/message');
+const Group=require('./model/group');
+const GroupUser=require('./model/groupUser');
+const Inbox=require('./model/inbox');
 
 
 const app=express();
@@ -19,8 +22,31 @@ app.use(bodyParser.json());
 app.use('/user',userRoute);
 app.use(messageRoute);
 
+//user message association
 User.hasMany(Message);
 Message.belongsTo(User);
+
+//group message association
+Group.hasMany(Message);
+Message.belongsTo(Group);
+
+//group user association
+Group.belongsToMany(User,{through:GroupUser});
+User.belongsToMany(Group,{through:GroupUser});
+
+//sender(user) and inbox association
+User.hasMany(Inbox);
+Inbox.belongsTo(User);
+
+//group message association
+// async function f(){
+//     const u=await User.findOne({where:{email:'shahaxay34@gmail.com'}})
+//     // await u.createGroup({name:'g2',totalMember:10,message:'msg',name:'n'});
+//     await u.createGroup({name:'g2',totalMember:10});
+//     console.log("done");
+// }
+
+
 
 // db.sync({force:true})
 db.sync()
