@@ -1,31 +1,22 @@
+const Jwt=require('../service/jwt');
+const Error=require('../service/error');
 const Message=require('../model/message');
 const Inbox=require('../model/inbox');
 const sequelize = require('../service/db');
-const jwt=require('jsonwebtoken');
-const dotenv=require('dotenv');
-dotenv.config();
 
 const postSendMessage=async(req,res,next)=>{
     let groupId=req.params.groupId;
     //if no group
-    const group_id_payload=jwt.verify(groupId,process.env.SECRET_KEY);
+    const group_id_payload=Jwt.decrypt(groupId);
     groupId=group_id_payload.groupId;
     try{
         const message=await req.user.createMessage({message:req.body.message,name:req.user.name,groupId:groupId});
         res.status(201).json({status:"success"});
     }
     catch(err){
-        console.log(err);
-        res.status(500).json({message:"Internal Server Error"});
+        Error.internalServerError(err,res);
     }
-    
 }
-// const getAllMembersOfGroup=async(req,res)=>{
-//     const members=await Message.findAll({
-//         attributes:[[sequelize.fn('DISTINCT',sequelize.col('userId')),'members'],'name']
-//     })
-//     return members;
-// }
 
 const getMessages=async(req,res,next)=>{
     const last_message_id=+req.query.lastMessageId;
@@ -36,12 +27,9 @@ const getMessages=async(req,res,next)=>{
         const messages=await Message.findAll({
             // offset:last_message_id
         });
-        // const members=await getAllMembersOfGroup(req,res);
-        // console.log(members);
         res.status(201).json(messages);
     }catch(err){
-        console.log(err);
-        res.status(500).json({message:"Internal Server Error"});
+        Error.internalServerError(err,res);
     }
     
 }
@@ -59,8 +47,7 @@ const getInboxMessages=async(req,res,next)=>{
             res.status(201).json(inboxMessages);
         }
         catch(err){
-        console.log(err);
-        res.status(500).json({message:"Internal Server Error"});
+            Error.internalServerError(err,res);
     }
     
 }

@@ -1,11 +1,10 @@
 const bcrypt=require('bcrypt');
-const jwt=require('jsonwebtoken');
-const dotenv=require('dotenv');
 
 const User=require('../model/user');
 const Group=require('../model/group');
-
-dotenv.config();
+const GroupUser=require('../model/groupUser');
+const Jwt=require('../service/jwt');
+const Error=require('../service/error');
 
 const postSignup=async (req,res,next)=>{
     const {name,email,password,phone} =req.body;
@@ -24,8 +23,7 @@ const postSignup=async (req,res,next)=>{
             res.status(201).json({id:result.id});
         }
         catch(err){
-            console.log(err);
-            res.status(501).json({message:"server internal problem"});
+            Error.internalServerError(err,res);
         }
     });
 }
@@ -40,8 +38,7 @@ const postLogin=async(req,res,next)=>{
                     return res.status(500).json({message:"server internal error"});
                 }
                 if(result){
-                    const secret_key=process.env.SECRET_KEY;
-                    const encrypted_userId=jwt.sign({userId:user.id},secret_key);
+                    const encrypted_userId=Jwt.encrypt({userId:user.id});
                     res.status(201).json({id:encrypted_userId,name:user.name});
                 }else{
                     res.status(401).json({message:"User not authorized"});
@@ -68,7 +65,7 @@ const getUsers=async(req,res,next)=>{
             if(user.id==req.user.id){
                 return;
             }
-            user.dataValues.id=jwt.sign({userId:user.id},process.env.SECRET_KEY);
+            user.dataValues.id=Jwt.encrypt({userId:user.id});
             return user;
         })
         res.status(201).json(users);
@@ -82,9 +79,8 @@ const getUsers=async(req,res,next)=>{
 const postSendInvitation=async(req,res,next)=>{
     let {users,name,groupId}=req.body;
     try{
-        // groupId=jwt.verify(groupId,process.env.SECRET_KEY).groupId;
         users.forEach(async user=>{
-            let receiverId=jwt.verify(user,process.env.SECRET_KEY);
+            let receiverId=Jwt.decrypt(user);
             await req.user.createInbox({
                 message:`http://localhost:3000/user/join-group/${groupId}`, //no need of header jwt
                 receiver:receiverId.userId
@@ -103,13 +99,18 @@ const postSendInvitation=async(req,res,next)=>{
 
 const getJoinGroup=async (req,res,next)=>{
     let groupId=req.params.groupId;
-    groupId=jwt.verify(groupId,process.env.SECRET_KEY).groupId;
+    groupId=Jwt.decrypt(groupId).groupId;
     try{
+        const isAlreadyMember=await GroupUser.findOne({where:{groupId:groupId,userId:req.user.id}});
+        if(isAlreadyMember){
+            return res.status(409).json({message:"already in group"})
+        }
         const group=await Group.findByPk(groupId);
-        const result=await req.user.addGroup(group);
+        const result=await req.user.addGroup(group,{through:{isAdmin:false}});
+        // console.log(result);
         let totalMember=group.totalMember+1;
+        // console.log(totalMember);
         await Group.update({totalMember:totalMember},{where:{id:groupId}});
-        console.log(result);
         res.status(201).json({message:"success"});
     }
     catch(err){
@@ -118,10 +119,55 @@ const getJoinGroup=async (req,res,next)=>{
     }
 }
 
+// const postIsAdmin=async(req,res,next)=>{
+//     console.log(req.body.groupId);
+//     let groupId=Jwt.decrypt(req.body.groupId).groupId;
+//     try{
+//         const admin=await GroupUser.findOne({
+//             attributes:['isAdmin'],
+//             where:{groupId:groupId,userId:req.user.id}
+//         })
+//         console.log(admin.dataValues);
+//         res.status(201).json(admin.dataValues);
+//     }
+//     catch(err){
+//         console.log(err);
+//         res.status(500).json({message:"internal surver error"});
+        
+//     }
+// }
+
+const postSearchUser=async(req,res,next)=>{
+    let {toSearch,column,groupId}=req.body;
+    try{
+        //Member?
+        groupId=Jwt.decrypt(groupId).groupId;
+
+        let users=await User.findAll({
+            attributes:['id','name'],
+            where:{[column]:toSearch}});
+
+            users=await Promise.all(users.map(async user=>{
+
+            const result=await GroupUser.findOne({where:{groupId:groupId,userId:user.id}});
+            user.dataValues.isMember=(result)?true:false;
+            user.dataValues.id=Jwt.encrypt({userId:user.id});
+            return user.dataValues;
+        }));
+        console.log(users);
+        res.status(201).json(users);
+    }
+    catch(err){
+        Error.internalServerError(err,res);
+    }
+}
+
 module.exports={ 
     postSignup,
     postLogin,
     getUsers,
     postSendInvitation,
-    getJoinGroup
+    getJoinGroup,
+    // postIsAdmin,
+    postSearchUser
 }

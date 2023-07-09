@@ -6,6 +6,11 @@ const groupUser=sequelize.define("groupUser",{
         type:Sequelize.INTEGER,
         primaryKey:true,
         autoIncrement:true 
+    },
+    isAdmin:{
+        type:Sequelize.BOOLEAN,
+        default:false,
+        allowNull:false
     }
 });
 

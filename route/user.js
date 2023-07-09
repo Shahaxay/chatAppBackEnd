@@ -11,17 +11,27 @@ route.post('/signup',userController.postSignup);
 
 route.post('/login',userController.postLogin);
 
-route.post('/create-group',Authentication.authenticate,groupController.postCreateGroup);
+route.use(Authentication.authenticate);
 
-route.get('/get-groups',Authentication.authenticate,groupController.getGroups);
+route.post('/create-group',groupController.postCreateGroup);
 
-route.get('/group/:groupId',Authentication.authenticate,groupController.getGroupMessage);
+route.get('/get-groups',groupController.getGroups);
 
-route.get('/get-users',Authentication.authenticate,userController.getUsers);
+route.get('/group/:groupId',groupController.getGroupMessage);
 
-route.post('/send-invitation',Authentication.authenticate,userController.postSendInvitation);
+route.get('/get-users',userController.getUsers);
 
-route.get('/join-group/:groupId',Authentication.authenticate,userController.getJoinGroup);
+route.post('/send-invitation',userController.postSendInvitation);
+
+route.get('/join-group/:groupId',userController.getJoinGroup);
+
+// route.post('/is-admin',userController.postIsAdmin);
+
+route.post('/search-user',userController.postSearchUser);
+
+
+
+
 
 
 module.exports=route;

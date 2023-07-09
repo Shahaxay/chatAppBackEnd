@@ -4,6 +4,8 @@ const bodyParser=require('body-parser');
 
 const userRoute=require('./route/user');
 const messageRoute=require('./route/message');
+const groupRoute=require('./route/group');
+const adminRoute=require('./route/admin');
 const db=require('./service/db');
 const User=require('./model/user');
 const Message=require('./model/message');
@@ -21,6 +23,8 @@ app.use(bodyParser.json());
 
 app.use('/user',userRoute);
 app.use(messageRoute);
+app.use('/group',groupRoute);
+app.use('/admin',adminRoute);
 
 //user message association
 User.hasMany(Message);
