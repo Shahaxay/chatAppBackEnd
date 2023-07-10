@@ -6,10 +6,10 @@ const User=require('../model/user');
 dotenv.config();
 
 exports.authenticate=async(req,res,next)=>{
-    const token=req.headers.token;
-    const secret_key=process.env.SECRET_KEY;
-    const decrypt_payload=jwt.verify(token,secret_key);
     try{
+        const token=req.headers.token;
+        const secret_key=process.env.SECRET_KEY;
+        const decrypt_payload=jwt.verify(token,secret_key);
         const user=await User.findByPk(decrypt_payload.userId);
         req.user=user;
     }

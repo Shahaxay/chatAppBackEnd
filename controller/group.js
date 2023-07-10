@@ -48,7 +48,7 @@ const getGroupMessage = async (req, res, next) => {
             attributes: ['isAdmin'],
             where: { userId: req.user.id, groupId: dcrypt }
         });
-        console.log(messages); 
+        // console.log(messages); 
         res.status(201).json({messages,isAdmin:user.isAdmin});
         //fetch group chat
     }

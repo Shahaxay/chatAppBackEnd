@@ -5,12 +5,12 @@ const Authentication=require('../middleware/authenticate');
 
 const route=express.Router();
 
-route.use(Authentication.authenticate);
+// route.use(Authentication.authenticate);
 
-route.post('/send-message/:groupId',messageController.postSendMessage);
+route.post('/send-message/:groupId',Authentication.authenticate,messageController.postSendMessage);
 
-route.get('/get-messages/:groupId',messageController.getMessages);
+route.get('/get-messages/:groupId',Authentication.authenticate,messageController.getMessages);
 
-route.get('/message/get-inbox-message',messageController.getInboxMessages);
+route.get('/message/get-inbox-message',Authentication.authenticate,messageController.getInboxMessages);
 
 module.exports=route;
