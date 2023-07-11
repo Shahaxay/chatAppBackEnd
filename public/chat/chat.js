@@ -53,11 +53,7 @@ socket.on('user-disconnected',name=>{
 })
 
 socket.on('received-message',message=>{
-    console.log("received",message);
-    console.log(socket.id, message.senderSocketId);
-    if(socket.id!==message.senderSocketId){
-        addGroupMessage(`${message.name} : ${message.message}`);
-    }
+    addGroupMessage(`${message.name} : ${message.message}`);
 })
 
 //scrollable div pointed at last
@@ -117,8 +113,6 @@ send_msg_form.addEventListener('submit', async (e) => {
             const result = await axios.post('http://localhost:3000/send-message/' + group, msg_obj, { headers: { token: localStorage.getItem('token') } });
             addMessage('You', compose_msg.value);
             scrollToLast();
-            // addGroupMessage(`You : ${compose_msg.value}`);
-            // socket.emit('send-group-message',localStorage.getItem('group'),compose_msg.value,localStorage.getItem('name'));
             socket.emit('send-group-message',compose_msg.value);
         }else{
             alert('This is only made for getting invitation purpose');
@@ -437,7 +431,6 @@ async function createMemberElement(member){
             console.log(name,id,isAdmin);
             //check current user is admin or not
             try{
-                // const admin=await axios.post(`http://localhost:3000/user/is-admin`,{groupId:localStorage.getItem('group')},{headers:{token:localStorage.getItem('token')}});
                 if(localStorage.getItem('isAdmin')=='true'){
                     displayUserAction(name,id,e);
                     
@@ -524,8 +517,6 @@ window.addEventListener('click',async(e)=>{
         send_invitation_div.style.display='none';
     }
 })
-
-//trying to remove the box after clicking the outside of that dialog box
 
 
 

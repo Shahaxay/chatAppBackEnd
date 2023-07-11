@@ -1,3 +1,5 @@
+const {Server}=require('socket.io');
+const {instrument}=require('@socket.io/admin-ui');
 const express=require('express');
 const cors=require('cors');
 const bodyParser=require('body-parser');
@@ -28,8 +30,12 @@ app.use(bodyParser.json());
 const server=http.createServer(app);
 
 //socket.io
-const io=require('socket.io')(server);
-
+const io=new Server(server,{
+    cors:{
+        origin:['https://admin.socket.io'],
+        credentials:true
+    }
+})
 //working with socket.io
 io.on('connection',socket=>{
     console.log("connected");
@@ -49,30 +55,27 @@ io.on('connection',socket=>{
         if(socket.groupId){
             socket.to(socket.groupId).emit('user-disconnected',socket.name);
         }
+        socket.join(socket.id);
         socket.groupId=groupId;
-        console.log(socket.groupId);
+        // console.log(socket.groupId);
         socket.join(socket.groupId);
-        console.log(socket.rooms.size)
-        console.log("joined");
+        // console.log(socket.rooms.size)
+        // console.log(`${socket.name} joined ${socket.groupId}`);
         socket.to(groupId).emit('user-connected',socket.name);
     });
 
     socket.on('send-group-message',(message)=>{
-        console.log(socket.groupId);
-        console.log(socket.id);
-        socket.broadcast.to(socket.groupId).emit('received-message',{name:socket.name,message:message,senderSocketId:socket.id});
+        // console.log(socket.groupId,socket.id);
+        socket.broadcast.to(socket.groupId).emit('received-message',{name:socket.name,message:message});
     })
-
-    // socket.on('send-group-message',(groupId,message,name)=>{
-    //     groupId=Jwt.decrypt(groupId).groupId;
-    //     console.log(socket.groupId);
-    //     console.log(socket.id);
-    //     socket.broadcast.to(groupId).emit('received-message',{name:name,message:message,senderSocketId:socket.id});
-    // })
-      
-
     
 })  
+
+//socket.io admin ui
+instrument(io,{auth:false}); 
+
+
+express.static(path.join(__dirname,'public'));
 
 app.use('/user',userRoute);
 app.use(messageRoute);
@@ -98,15 +101,6 @@ User.belongsToMany(Group,{through:GroupUser});
 //sender(user) and inbox association
 User.hasMany(Inbox);
 Inbox.belongsTo(User);
-
-//group message association
-// async function f(){
-//     const u=await User.findOne({where:{email:'shahaxay34@gmail.com'}})
-//     // await u.createGroup({name:'g2',totalMember:10,message:'msg',name:'n'});
-//     await u.createGroup({name:'g2',totalMember:10});
-//     console.log("done");
-// }
-
 
 
 // db.sync({force:true})
