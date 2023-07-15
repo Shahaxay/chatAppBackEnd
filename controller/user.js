@@ -119,24 +119,6 @@ const getJoinGroup=async (req,res,next)=>{
     }
 }
 
-// const postIsAdmin=async(req,res,next)=>{
-//     console.log(req.body.groupId);
-//     let groupId=Jwt.decrypt(req.body.groupId).groupId;
-//     try{
-//         const admin=await GroupUser.findOne({
-//             attributes:['isAdmin'],
-//             where:{groupId:groupId,userId:req.user.id}
-//         })
-//         console.log(admin.dataValues);
-//         res.status(201).json(admin.dataValues);
-//     }
-//     catch(err){
-//         console.log(err);
-//         res.status(500).json({message:"internal surver error"});
-        
-//     }
-// }
-
 const postSearchUser=async(req,res,next)=>{
     let {toSearch,column,groupId}=req.body;
     try{

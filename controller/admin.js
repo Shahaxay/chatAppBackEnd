@@ -1,6 +1,5 @@
 const Group=require('../model/group');
 const User=require('../model/user');
-const GroupUser=require('../model/groupUser');
 const Jwt=require('../service/jwt');
 const Error=require('../service/error');
 

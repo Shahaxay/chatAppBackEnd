@@ -47,6 +47,7 @@ const getGroupMessage = async (req, res, next) => {
             offset:last_index,
             // limit:5
         });
+        
         //checking for admin
         const user = await GroupUser.findOne({
             attributes: ['isAdmin'],
@@ -54,7 +55,6 @@ const getGroupMessage = async (req, res, next) => {
         });
         // console.log(messages); 
         res.status(201).json({messages,isAdmin:user.isAdmin});
-        //fetch group chat
     }
     catch (err) {
         Error.internalServerError(err,res);

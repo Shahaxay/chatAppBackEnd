@@ -25,23 +25,6 @@ const postSendMessage=async(req,res,next)=>{
     }
 }
 
-//this is not used yet
-const getMessages=async(req,res,next)=>{
-    const last_message_id=+req.query.lastMessageId;
-    const groupId=req.params.groupId;
-    console.log(last_message_id);
-    console.log(groupId);
-    try{
-        const messages=await Message.findAll({
-            // offset:last_message_id
-        });
-        res.status(201).json(messages);
-    }catch(err){
-        Error.internalServerError(err,res);
-    }
-    
-}
-
 const getInboxMessages=async(req,res,next)=>{
     try{
         let inboxMessages=await Inbox.findAll({
@@ -85,7 +68,6 @@ const postSendMultimedia=async(req,res,next)=>{
 
 module.exports={
     postSendMessage,
-    getMessages,
     getInboxMessages,
     postSendMultimedia
 }

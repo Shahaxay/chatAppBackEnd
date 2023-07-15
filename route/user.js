@@ -25,8 +25,6 @@ route.post('/send-invitation',userController.postSendInvitation);
 
 route.get('/join-group/:groupId',userController.getJoinGroup);
 
-// route.post('/is-admin',userController.postIsAdmin);
-
 route.post('/search-user',userController.postSearchUser);
 
 
