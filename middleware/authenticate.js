@@ -12,10 +12,11 @@ exports.authenticate=async(req,res,next)=>{
         const decrypt_payload=jwt.verify(token,secret_key);
         const user=await User.findByPk(decrypt_payload.userId);
         req.user=user;
+        next();
     }
     catch(err){
         console.log(err);
-        res.status(404).json({message:"not a valid user"});
+        //this should prevent from anyone to access the file
+        return res.status(404).json({message:"not a valid user"}); 
     }
-    next();
 }

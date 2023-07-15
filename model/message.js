@@ -11,6 +11,9 @@ const message=sequelize.define('message',{
         type:Sequelize.STRING,
         allowNull:false
     },
+    multimedia:{
+        type:Sequelize.STRING
+    },
     name:{
         type:Sequelize.STRING,
         allowNull:false

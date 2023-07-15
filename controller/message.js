@@ -1,8 +1,15 @@
+const fs=require('fs');
+const util=require('util');
+
 const Jwt=require('../service/jwt');
 const Error=require('../service/error');
 const Message=require('../model/message');
 const Inbox=require('../model/inbox');
 const sequelize = require('../service/db');
+const AWS=require('../service/awsS3');
+
+//converting fs.unlink fn which flow traditional callback into promise
+const unlinkFile=util.promisify(fs.unlink);
 
 const postSendMessage=async(req,res,next)=>{
     let groupId=req.params.groupId;
@@ -18,6 +25,7 @@ const postSendMessage=async(req,res,next)=>{
     }
 }
 
+//this is not used yet
 const getMessages=async(req,res,next)=>{
     const last_message_id=+req.query.lastMessageId;
     const groupId=req.params.groupId;
@@ -52,12 +60,32 @@ const getInboxMessages=async(req,res,next)=>{
     
 }
 
+const postSendMultimedia=async(req,res,next)=>{
+    console.log(req.file);
+    console.log(req.body);
+    let {element,groupId}=req.body;
+    const filename=req.file.originalname;
 
+    groupId=Jwt.decrypt(groupId).groupId;
+    console.log(req.user);
 
-
+    try{
+        const location=await AWS.uploadToS3(req.file);
+        //delete file form server
+        await unlinkFile(req.file.path);
+        //need to save the link as chat with respect to particular group
+        const msg=(element=='document')?filename:element;
+        await req.user.createMessage({message:msg,name:req.user.name,multimedia:location,groupId:groupId});
+        res.status(201).json({location:location,element:element,filename:filename});
+    }
+    catch(err){
+        Error.internalServerError(err,res);
+    }
+}
 
 module.exports={
     postSendMessage,
     getMessages,
-    getInboxMessages
+    getInboxMessages,
+    postSendMultimedia
 }

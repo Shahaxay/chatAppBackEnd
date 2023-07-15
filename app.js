@@ -17,6 +17,7 @@ const Group=require('./model/group');
 const GroupUser=require('./model/groupUser');
 const Inbox=require('./model/inbox');
 const Jwt=require('./service/jwt');
+const Authentication=require('./middleware/authenticate');
 
 
 const app=express();
@@ -68,6 +69,11 @@ io.on('connection',socket=>{
         // console.log(socket.groupId,socket.id);
         socket.broadcast.to(socket.groupId).emit('received-message',{name:socket.name,message:message});
     })
+
+    socket.on('send-multimedia',(element,location,filename,cb)=>{
+        socket.to(socket.groupId).emit('redeived-multimedia',{element,location,filename});
+        cb("message sent");
+    })
     
 })  
 
@@ -78,9 +84,12 @@ instrument(io,{auth:false});
 express.static(path.join(__dirname,'public'));
 
 app.use('/user',userRoute);
-app.use(messageRoute);
+app.use('/message',messageRoute);
 app.use('/group',groupRoute);
 app.use('/admin',adminRoute);
+
+//*not preventing chat.index from rendering*
+// app.use('/chat/chat.index',Authentication.authenticate);
 
 app.use((req,res,next)=>{
     res.sendFile(path.join(__dirname,`public/${req.url}`));

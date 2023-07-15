@@ -48,6 +48,8 @@ footer{
     background-color: blue;
     width: 100vw;
     padding: .3rem;
+    display: block;
+    /* height: 3rem; */
 }
 footer input{
     width: 50vw;
@@ -90,6 +92,23 @@ footer input{
     display: flex;
 }
 
+.multimedia{
+    color: white;
+    text-decoration: underline;
+}
+
+#multimedia_div{
+    width: 50vw;
+    background-color: rgb(172, 230, 172);
+    position:fixed;
+    bottom:3rem;
+    left:25vw;
+    text-align: center;
+    display:none;
+
+
+}
+
 #serch_member{
 border: 1px double red;
 display: none;
@@ -114,4 +133,13 @@ place-items: center;
 ul{
     list-style: none;
     line-height: 1.5rem;
+}
+
+video{
+    width: 140px;
+    height: 150px;
+}
+
+audio{
+    height: 30px;
 }

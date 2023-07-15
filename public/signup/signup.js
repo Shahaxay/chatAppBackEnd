@@ -6,7 +6,7 @@ const signup_form_password=document.getElementById('signup_form_password');
 const signup_form_submit=document.getElementById('signup_form_submit');
 
 
-signup_form_submit.addEventListener('click',async (e)=>{
+signup_form.addEventListener('submit',async (e)=>{
     e.preventDefault();
     const request_body={
         name:signup_form_name.value,
@@ -15,7 +15,7 @@ signup_form_submit.addEventListener('click',async (e)=>{
         password:signup_form_password.value
     };
     try{
-        const result=await axios.post('http://localhost:3000/user/signup',request_body,{Credential:"include"});
+        const result=await axios.post('http://localhost:3000/user/signup',request_body);
         alert("Successfuly signed up");
     }
     catch(err){

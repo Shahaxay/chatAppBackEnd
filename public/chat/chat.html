@@ -82,10 +82,22 @@
         <ul id="searched_member_dest">
         </ul>
     </div>
+    <!-- multimedia -->
+    <div id="multimedia_div" class="mult" >
+        <form id="multimedia_form" method="post" class="mult">
+            <label for="input_file" id="input_file_label"></label>
+            <input type="file" id="input_file" class="mult" required>
+            <button type="submit">send</button>
+        </form>
+    </div>
     <footer>
         <form id="send_msg_form" class="center">
-            <input type="text" id="compose_msg">
-            <button type="submit">send</button>
+            <label class="multimedia mult" id="audio">audio</label>
+            <label class="multimedia mult" id="video">video</label>
+            <label class="multimedia mult" id="image">image</label>
+            <input type="text" id="compose_msg" required>
+            <button type="submit" id="main_send_btn">send</button>
+            <label class="multimedia mult" id="document">document</label>
         </form>
     </footer>
     
