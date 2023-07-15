@@ -41,14 +41,12 @@ const getGroupMessage = async (req, res, next) => {
         let last_index=Number(req.query.last);
         let groupId = req.params.groupId;
         const dcrypt = Jwt.decrypt(groupId).groupId;
-        // console.log(dcrypt);
         let group = await Group.findByPk(dcrypt);
         const messages = await group.getMessages({ 
             attributes: ['id','name', 'message','multimedia'],
             offset:last_index,
-            limit:5
+            // limit:5
         });
-        console.log(last_index,messages);
         //checking for admin
         const user = await GroupUser.findOne({
             attributes: ['isAdmin'],
@@ -78,8 +76,6 @@ const getGroupMembers = async (req, res, next) => {
             delete user.dataValues.groupUser;
             return user.dataValues;
         })
-        // groupUsers.groupName=group.name;
-        // groupUsers.totalMembers=group.totalMember;
         console.log(groupUsers);
         res.status(201).json({ groupUsers, groupName: group.name, totalMembers: group.totalMember });
     }

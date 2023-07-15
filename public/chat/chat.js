@@ -234,7 +234,8 @@ window.addEventListener('DOMContentLoaded', async () => {
         group = localStorage.getItem('group');
     }
     if (group != -1) {
-        await getGroupMessage(group);
+        let temporary_id=localStorage.getItem('temp_id');
+        await getGroupMessage(group,temporary_id);
         scrollToLast();
     } else {
         footer.style.display = 'none';
@@ -304,14 +305,15 @@ function displayGroupFeatures() {
 group_list_dest.addEventListener('click', async (e) => {
     displayGroupFeatures();
     group = e.target.id;
+    const temporary_id = e.target.dataset.tempid;
     localStorage.setItem('group', group);
+    localStorage.setItem('temp_id',temporary_id);
     const navigateTo = e.target.id; //groupId
     const siblings = Array.from(e.target.parentNode.children);
     siblings.forEach(child => {
         child.style.backgroundColor = 'white';
     })
     e.target.style.backgroundColor = "#efefef";
-    const temporary_id = e.target.dataset.tempid;
     getGroupMessage(navigateTo, temporary_id);
 });
 
@@ -323,29 +325,35 @@ async function getGroupMessage(navigateTo, temporary_id) {
         let last_msg_id = 0;
         if (message_ar) {
             message_ar = JSON.parse(message_ar);
-            last_msg_id = message_ar[message_ar.length - 1].id;
+            last_msg_id = message_ar.count;
         }
         console.log(last_msg_id);
         const chats = await axios.get(`http://localhost:3000/user/group/${navigateTo}?last=${last_msg_id}`, { headers: { token: localStorage.getItem('token') } });
-        console.log(chats.data.messages.length > 0);
+        const msg_len=chats.data.messages.length;
+        console.log(msg_len > 0);
         console.log('....', message_ar);
         if (message_ar) {
             console.log("present");
-            if (chats.data.messages.length > 0) {
-                message_ar = message_ar.concat(chats.data.messages);
-                if (message_ar.length > 10) {
-                    message_ar = message_ar.slice(message_ar.length - 10);
+            if (msg_len > 0) {
+                message_ar.message = message_ar.message.concat(chats.data.messages);
+                message_ar.count+=msg_len;
+                if (message_ar.message.length > 10) {
+                    message_ar.message = message_ar.message.slice(message_ar.message.length - 10);
                 }
             }
-        } else if (chats.data.messages.length > 0) {
-            message_ar = chats.data.messages;
+        } else if (msg_len > 0) {
+            message_ar={
+                message:chats.data.messages,
+                count:msg_len
+            }
+            // message_ar = chats.data.messages;
             console.log("absent");
         }
         console.log(message_ar);
         chat_dest.innerHTML = "";
         if(message_ar){
             localStorage.setItem(temporary_id, JSON.stringify(message_ar));
-            message_ar.forEach(chat => {
+            message_ar.message.forEach(chat => {
                 const { name, message, multimedia } = chat;
                 addMessage(name, message, multimedia);
             })
