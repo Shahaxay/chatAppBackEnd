@@ -237,6 +237,7 @@ display_group_btn.addEventListener('click', async () => {
             alert('no group found');
         }
         group_list_dest.innerHTML = "";
+        temp_id=0;
         for (let group of groups.data) {
             displayGroupName(group);
         }
@@ -289,13 +290,12 @@ async function getGroupMessage(navigateTo, temporary_id) {
             message_ar = JSON.parse(message_ar);
             last_msg_id = message_ar.count;
         }
-        console.log(last_msg_id);
+        // console.log(last_msg_id);
         const chats = await axios.get(`http://3.92.132.4/user/group/${navigateTo}?last=${last_msg_id}`, { headers: { token: localStorage.getItem('token') } });
         const msg_len=chats.data.messages.length;
-        console.log(msg_len > 0);
-        console.log('....', message_ar);
+        // console.log(msg_len > 0);
         if (message_ar) {
-            console.log("present");
+            // console.log("present");
             if (msg_len > 0) {
                 message_ar.message = message_ar.message.concat(chats.data.messages);
                 message_ar.count+=msg_len;
@@ -309,9 +309,9 @@ async function getGroupMessage(navigateTo, temporary_id) {
                 count:msg_len
             }
             // message_ar = chats.data.messages;
-            console.log("absent");
+            // console.log("absent");
         }
-        console.log(message_ar);
+        // console.log(message_ar);
         chat_dest.innerHTML = "";
         if(message_ar){
             localStorage.setItem(temporary_id, JSON.stringify(message_ar));
@@ -472,7 +472,7 @@ view_group_member.addEventListener('click', async (e) => {
         const groupId = localStorage.getItem('group');
         const groupMembers = await axios.get('http://3.92.132.4/group/get-group-members/' + groupId, { headers: { token: localStorage.getItem('token') } });
         //expected name id isadmin groupname totalMember
-        group_member_list_dest.innerHTML = `<h1 class="center">${groupMembers.data.groupName}</h1><p class="center">Group: ${groupMembers.data.totalMembers} participants</p><br><hr></ht>`;
+        group_member_list_dest.innerHTML = `<h1 class="center">${groupMembers.data.groupName}</h1><p class="center" id="participants_count">Group: ${groupMembers.data.totalMembers} participants</p><br><hr></ht>`;
         groupMembers.data.groupUsers.forEach(member => {
             createMemberElement(member);
         })
@@ -495,72 +495,78 @@ async function createMemberElement(member) {
         span.textContent = ' ~Admin';
         li.appendChild(span);
     } else {
-        li.addEventListener('click', async (e) => {
-            //popup respective info to delete member or make him admin
-            //if not admin
-            let name = e.target.firstChild.textContent;
-            let id = e.target.id;
-            let isAdmin = e.target.getAttribute('isadmin'); //custom attribute
-            console.log(name, id, isAdmin);
-            //check current user is admin or not
-            try {
-                if (localStorage.getItem('isAdmin') == 'true') {
-                    displayUserAction(name, id, e);
-
-                } else {
-                    console.log("you are not admin");
-                    alert('later phone number can be added here');
-
-                }
-            }
-            catch (err) {
-                console.log(err);
-            }
-
-        })
+        li.addEventListener('click',addMemberAction)
     }
     group_member_list_dest.appendChild(li);
+}
+async function addMemberAction (e){
+    //popup respective info to delete member or make him admin
+    //if not admin
+    let name = e.target.firstChild.textContent;
+    let id = e.target.id;
+    let isAdmin = e.target.getAttribute('isadmin'); //custom attribute
+    console.log(name, id, isAdmin);
+    //check current user is admin or not
+    try {
+        if (localStorage.getItem('isAdmin') == 'true') {
+            displayUserAction(name, id, e);
+
+        } else {
+            console.log("you are not admin");
+            alert('later phone number can be added here');
+
+        }
+    }
+    catch (err) {
+        console.log(err);
+    }
+
 }
 
 function displayUserAction(name, id, e) {
     group_member_action_dest.innerHTML = "";
     const li1 = document.createElement('li');
-    // li1.id=id;
     li1.textContent = `make ${name} admin`;
     const li2 = document.createElement('li');
-    // li2.id=id;
     li2.textContent = `remove ${name}`;
-    li1.addEventListener('click', async () => {
-        try {
-            const obj = { userId: id, groupId: localStorage.getItem('group') };
-            console.log(obj);
-            const makeAdminResult = await axios.post('http://3.92.132.4/group/make-admin', { userId: id, groupId: localStorage.getItem('group') }, { headers: { token: localStorage.getItem('token') } });
-            //update status of span
-            let span = document.createElement('span');
-            span.textContent = '~Admin';
-            e.target.appendChild(span);
-            alert(`now ${name} is also an admin`);
-            each_group_member_div.style.display = 'none';
-        }
-        catch (err) {
-            console.log(err);
-        }
-    })
-    li2.addEventListener('click', async () => {
-        try {
-            const removeMemberResult = await axios.post('http://3.92.132.4/group/remove-member', { userId: id, groupId: localStorage.getItem('group') }, { headers: { token: localStorage.getItem('token') } });
-            //remove user from list
-            alert(`${name} is removed from group`);
-            each_group_member_div.style.display = 'none';
-            e.target.remove();
-        }
-        catch (err) {
-            console.log(err);
-        }
-    })
+    li1.addEventListener('click',()=> makeAdmin(id,e));
+    li2.addEventListener('click',()=>removeMember(id,e))
     group_member_action_dest.append(li1, li2);
 
 
+}
+
+async function makeAdmin(id,e){
+    try {
+        const obj = { userId: id, groupId: localStorage.getItem('group') };
+        console.log(obj);
+        const makeAdminResult = await axios.post('http://3.92.132.4/group/make-admin', { userId: id, groupId: localStorage.getItem('group') }, { headers: { token: localStorage.getItem('token') } });
+        //update status of span
+        let span = document.createElement('span');
+        span.textContent = '~Admin';
+        e.target.appendChild(span);
+        e.target.setAttribute('isadmin','true');
+        alert(`now ${name} is also an admin`);
+        each_group_member_div.style.display = 'none';
+    }
+    catch (err) {
+        console.log(err);
+    }
+}
+
+async function removeMember(id,e){
+    try {
+        const removeMemberResult = await axios.post('http://3.92.132.4/group/remove-member', { userId: id, groupId: localStorage.getItem('group') }, { headers: { token: localStorage.getItem('token') } });
+        //updating participant count
+        document.getElementById('participants_count').textContent=`Group: ${removeMemberResult.data.totalMembers} participants`
+        //remove user from list
+        alert(`${name} is removed from group`);
+        each_group_member_div.style.display = 'none';
+        e.target.remove();
+    }
+    catch (err) {
+        console.log(err);
+    }
 }
 
 //hiding showing the dialog box

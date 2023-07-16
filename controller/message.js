@@ -28,7 +28,7 @@ const postSendMessage=async(req,res,next)=>{
 const getInboxMessages=async(req,res,next)=>{
     try{
         let inboxMessages=await Inbox.findAll({
-            attributes:[[sequelize.literal('(SELECT name FROM Users WHERE useRs.id = inbox.userId)'), 'sender'],'message'],
+            attributes:[[sequelize.literal('(SELECT name FROM users WHERE users.id = inbox.userId)'), 'sender'],'message'],
             where:{receiver:req.user.id}});
             inboxMessages=inboxMessages.map(msg=>{
                 return msg.dataValues;
