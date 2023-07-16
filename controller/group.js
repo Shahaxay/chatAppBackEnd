@@ -114,7 +114,7 @@ const postRemoveMember = async (req, res, next) => {
         const group = await Group.findByPk(groupId);
         console.log(group.totalMember);
         Group.update({ totalMember: group.totalMember - 1 }, { where: { id: group.id } });
-        res.status(201).json({ success: true ,totalMember:group.totalMember-1});
+        res.status(201).json({totalMember:group.totalMember-1});
     }
     catch (err) {
         Error.internalServerError(err,res);

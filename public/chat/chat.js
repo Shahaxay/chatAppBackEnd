@@ -449,7 +449,6 @@ function showFoundUsers(user) {
     searched_member_dest.appendChild(li);
 }
 async function addMember(id) {
-    console.log("inside fn");
     //add remove-div alert
     const obj = {
         groupId: localStorage.getItem('group'),
@@ -558,7 +557,7 @@ async function removeMember(id,e){
     try {
         const removeMemberResult = await axios.post('http://3.92.132.4/group/remove-member', { userId: id, groupId: localStorage.getItem('group') }, { headers: { token: localStorage.getItem('token') } });
         //updating participant count
-        document.getElementById('participants_count').textContent=`Group: ${removeMemberResult.data.totalMembers} participants`
+        document.getElementById('participants_count').textContent=`Group: ${removeMemberResult.data.totalMember} participants`
         //remove user from list
         alert(`${name} is removed from group`);
         each_group_member_div.style.display = 'none';
