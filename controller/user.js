@@ -82,7 +82,7 @@ const postSendInvitation=async(req,res,next)=>{
         users.forEach(async user=>{
             let receiverId=Jwt.decrypt(user);
             await req.user.createInbox({
-                message:`http://localhost:3000/user/join-group/${groupId}`, //no need of header jwt
+                message:`http://3.80.195.139/user/join-group/${groupId}`, //no need of header jwt
                 receiver:receiverId.userId
             })
             console.log("created");

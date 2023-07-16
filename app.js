@@ -71,7 +71,7 @@ Inbox.belongsTo(User);
 // db.sync({force:true})
 db.sync()
 .then(result=>{
-    server.listen(3000,()=>console.log("listening to 3000..."));
+    server.listen(process.env.PORT||3000,()=>console.log("listening to 3000..."));
 })
 .catch(err=>console.log(err));
 
