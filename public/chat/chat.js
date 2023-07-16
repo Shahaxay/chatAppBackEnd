@@ -67,7 +67,7 @@ multimedia_form.addEventListener('submit', async (e) => {
     }
     multimedia_form.reset();
 
-    const result = await axios.post("http://3.80.195.139/message/send-multimedia", multimedia_obj, { headers: { token: localStorage.getItem('token'), 'Content-Type': 'multipart/form-data' } });
+    const result = await axios.post("http://3.92.132.4/message/send-multimedia", multimedia_obj, { headers: { token: localStorage.getItem('token'), 'Content-Type': 'multipart/form-data' } });
     const { element, location, filename } = result.data;
     displayMultimedia(element, location, filename);
     //socket.io
@@ -92,7 +92,7 @@ var group = -1;
 
 //socket.io-client
 
-const socket = io('http://3.80.195.139');
+const socket = io('http://3.92.132.4');
 
 socket.on('connect', () => {
     console.log(socket.id);
@@ -176,7 +176,7 @@ send_msg_form.addEventListener('submit', async (e) => {
     }
     try {
         if (group != -1) {
-            const result = await axios.post('http://3.80.195.139/message/send-message/' + group, msg_obj, { headers: { token: localStorage.getItem('token') } });
+            const result = await axios.post('http://3.92.132.4/message/send-message/' + group, msg_obj, { headers: { token: localStorage.getItem('token') } });
             addMessage('You', compose_msg.value);
             scrollToLast();
             socket.emit('send-group-message', compose_msg.value);
@@ -217,7 +217,7 @@ create_group_btn.addEventListener('click', async () => {
             name: name
         }
         try {
-            const result = await axios.post('http://3.80.195.139/user/create-group', create_group_obj, { headers: { token: localStorage.getItem('token') } });
+            const result = await axios.post('http://3.92.132.4/user/create-group', create_group_obj, { headers: { token: localStorage.getItem('token') } });
             alert(name + " group created successfully");
             //can be listed under groups
             displayGroupName(result.data)
@@ -232,7 +232,7 @@ create_group_btn.addEventListener('click', async () => {
 display_group_btn.addEventListener('click', async () => {
     serch_member_div.style.display = 'none';
     try {
-        const groups = await axios.get('http://3.80.195.139/user/get-groups', { headers: { token: localStorage.getItem('token') } });
+        const groups = await axios.get('http://3.92.132.4/user/get-groups', { headers: { token: localStorage.getItem('token') } });
         if (groups.data.length == 0) {
             alert('no group found');
         }
@@ -290,7 +290,7 @@ async function getGroupMessage(navigateTo, temporary_id) {
             last_msg_id = message_ar.count;
         }
         console.log(last_msg_id);
-        const chats = await axios.get(`http://3.80.195.139/user/group/${navigateTo}?last=${last_msg_id}`, { headers: { token: localStorage.getItem('token') } });
+        const chats = await axios.get(`http://3.92.132.4/user/group/${navigateTo}?last=${last_msg_id}`, { headers: { token: localStorage.getItem('token') } });
         const msg_len=chats.data.messages.length;
         console.log(msg_len > 0);
         console.log('....', message_ar);
@@ -336,7 +336,7 @@ invite_friends_btn.addEventListener('click', async () => {
     //make the list visible
     send_invitation_div.style.display = "grid";
     try {
-        const userList = await axios.get('http://3.80.195.139/user/get-users', { headers: { token: localStorage.getItem('token') } });
+        const userList = await axios.get('http://3.92.132.4/user/get-users', { headers: { token: localStorage.getItem('token') } });
         //do smthng with user
         user_list_dest.innerHTML = "";
         userList.data.forEach(user => {
@@ -373,7 +373,7 @@ send_invitation_form.addEventListener('submit', async (e) => {
         let userList = Array.from(form.querySelectorAll('input[name="users[]"]'));
         userList = userList.filter(checkbox => checkbox.checked).map(checkbox => checkbox.id);
         // console.log(userList);
-        const result = await axios.post('http://3.80.195.139/user/send-invitation', { users: userList, name: localStorage.getItem('name'), groupId: group }, { headers: { token: localStorage.getItem('token') } });//protect default group name
+        const result = await axios.post('http://3.92.132.4/user/send-invitation', { users: userList, name: localStorage.getItem('name'), groupId: group }, { headers: { token: localStorage.getItem('token') } });//protect default group name
 
         alert("invitation sent");
     }
@@ -393,7 +393,7 @@ inbox_btn.addEventListener('click', () => {
 
 async function getInboxMessage() {
     try {
-        const messages = await axios.get('http://3.80.195.139/message/get-inbox-message', { headers: { token: localStorage.getItem('token') } });
+        const messages = await axios.get('http://3.92.132.4/message/get-inbox-message', { headers: { token: localStorage.getItem('token') } });
         chat_dest.innerHTML = '';
         messages.data.forEach(message => {
             addMessage(message.sender, message.message);
@@ -420,7 +420,7 @@ search_form.addEventListener('submit', async (e) => {
     }
     console.log(serchedObj);
     try {
-        const result = await axios.post('http://3.80.195.139/user/search-user', serchedObj, { headers: { token: localStorage.getItem('token') } });
+        const result = await axios.post('http://3.92.132.4/user/search-user', serchedObj, { headers: { token: localStorage.getItem('token') } });
         if (result.data.length == 0) {
             alert('no such users');
         } else {
@@ -456,7 +456,7 @@ async function addMember(id) {
         userId: id
     }
     try {
-        const result = await axios.post('http://3.80.195.139/admin/add-member', obj, { headers: { token: localStorage.getItem('token') } });
+        const result = await axios.post('http://3.92.132.4/admin/add-member', obj, { headers: { token: localStorage.getItem('token') } });
         alert('added into group');
         searched_member_div.style.display = 'none';
     }
@@ -470,7 +470,7 @@ view_group_member.addEventListener('click', async (e) => {
     // group_member_div.style.display='grid';
     try {
         const groupId = localStorage.getItem('group');
-        const groupMembers = await axios.get('http://3.80.195.139/group/get-group-members/' + groupId, { headers: { token: localStorage.getItem('token') } });
+        const groupMembers = await axios.get('http://3.92.132.4/group/get-group-members/' + groupId, { headers: { token: localStorage.getItem('token') } });
         //expected name id isadmin groupname totalMember
         group_member_list_dest.innerHTML = `<h1 class="center">${groupMembers.data.groupName}</h1><p class="center">Group: ${groupMembers.data.totalMembers} participants</p><br><hr></ht>`;
         groupMembers.data.groupUsers.forEach(member => {
@@ -534,7 +534,7 @@ function displayUserAction(name, id, e) {
         try {
             const obj = { userId: id, groupId: localStorage.getItem('group') };
             console.log(obj);
-            const makeAdminResult = await axios.post('http://3.80.195.139/group/make-admin', { userId: id, groupId: localStorage.getItem('group') }, { headers: { token: localStorage.getItem('token') } });
+            const makeAdminResult = await axios.post('http://3.92.132.4/group/make-admin', { userId: id, groupId: localStorage.getItem('group') }, { headers: { token: localStorage.getItem('token') } });
             //update status of span
             let span = document.createElement('span');
             span.textContent = '~Admin';
@@ -548,7 +548,7 @@ function displayUserAction(name, id, e) {
     })
     li2.addEventListener('click', async () => {
         try {
-            const removeMemberResult = await axios.post('http://3.80.195.139/group/remove-member', { userId: id, groupId: localStorage.getItem('group') }, { headers: { token: localStorage.getItem('token') } });
+            const removeMemberResult = await axios.post('http://3.92.132.4/group/remove-member', { userId: id, groupId: localStorage.getItem('group') }, { headers: { token: localStorage.getItem('token') } });
             //remove user from list
             alert(`${name} is removed from group`);
             each_group_member_div.style.display = 'none';

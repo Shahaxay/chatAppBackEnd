@@ -15,7 +15,7 @@ signup_form.addEventListener('submit',async (e)=>{
         password:signup_form_password.value
     };
     try{
-        const result=await axios.post('http://3.80.195.139/user/signup',request_body);
+        const result=await axios.post('http://3.92.132.4/user/signup',request_body);
         alert("Successfuly signed up");
     }
     catch(err){

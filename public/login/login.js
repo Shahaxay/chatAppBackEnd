@@ -9,7 +9,7 @@ login_form.addEventListener('submit',async (e)=>{
         password:password.value
     };
     try{
-        const token=await axios.post('http://3.80.195.139/user/login',login_cred);
+        const token=await axios.post('http://3.92.132.4/user/login',login_cred);
         localStorage.setItem('token',token.data.id);
         localStorage.setItem('name',token.data.name);
         localStorage.setItem('group','-1'); //for loading particular page
