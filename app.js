@@ -17,6 +17,7 @@ const Group=require('./model/group');
 const GroupUser=require('./model/groupUser');
 const Inbox=require('./model/inbox');
 const Socket=require('./util/socket');
+const Schedule=require('./controller/schedule');
 // const Authentication=require('./middleware/authenticate');
 
 
@@ -38,6 +39,9 @@ const server=http.createServer(app);
 Socket.socket(server);
 
 express.static(path.join(__dirname,'public'));
+
+//scheduled last dat chat copying to archieve chat table
+Schedule.copyLastDayChatToArchieveChatTable();
 
 app.use('/user',userRoute);
 app.use('/message',messageRoute);

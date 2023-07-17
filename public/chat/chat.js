@@ -284,18 +284,16 @@ group_list_dest.addEventListener('click', async (e) => {
 async function getGroupMessage(navigateTo, temporary_id) {
     try {
         socket.emit('connect-group', navigateTo);
+        addGroupMessage('You joined the group');
         let message_ar = localStorage.getItem(temporary_id);
         let last_msg_id = 0;
         if (message_ar) {
             message_ar = JSON.parse(message_ar);
             last_msg_id = message_ar.count;
         }
-        // console.log(last_msg_id);
         const chats = await axios.get(`http://3.92.132.4/user/group/${navigateTo}?last=${last_msg_id}`, { headers: { token: localStorage.getItem('token') } });
         const msg_len=chats.data.messages.length;
-        // console.log(msg_len > 0);
         if (message_ar) {
-            // console.log("present");
             if (msg_len > 0) {
                 message_ar.message = message_ar.message.concat(chats.data.messages);
                 message_ar.count+=msg_len;
@@ -308,8 +306,6 @@ async function getGroupMessage(navigateTo, temporary_id) {
                 message:chats.data.messages,
                 count:msg_len
             }
-            // message_ar = chats.data.messages;
-            // console.log("absent");
         }
         // console.log(message_ar);
         chat_dest.innerHTML = "";
@@ -572,6 +568,7 @@ async function removeMember(id,e){
 window.addEventListener('click', async (e) => {
     // console.log(e.target.nodeName);
     // console.log(e.target.id);
+
     //hiding search dialog box
     if (e.target.id == 'searched_member_div') {
         searched_member_div.style.display = 'none';
