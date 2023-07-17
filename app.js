@@ -41,7 +41,7 @@ Socket.socket(server);
 express.static(path.join(__dirname,'public'));
 
 //scheduled last dat chat copying to archieve chat table
-Schedule.copyLastDayChatToArchieveChatTable();
+// Schedule.copyLastDayChatToArchieveChatTable();
 
 app.use('/user',userRoute);
 app.use('/message',messageRoute);

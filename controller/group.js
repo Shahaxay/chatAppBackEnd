@@ -44,12 +44,12 @@ const getGroupMessage = async (req, res, next) => {
         let group = await Group.findByPk(dcrypt);
         const messages = await group.getMessages({ 
             attributes: ['id','name', 'message','multimedia'],
-            
+
             /*offset is used to send only new message to the client based on its localstorage last msg
             and this work only when all the message kept in a single table, if there is archieveMessage
             table is there to store old msg then there is no meaning of applying localstorage concept so it is commented out*/
 
-            // offset:last_index, 
+            offset:last_index, 
         });
         
         //checking for admin
